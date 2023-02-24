@@ -66,6 +66,7 @@ class MainWindow(FormUI, WindowUI):
         self.mW = np.zeros(101)
         self.dbm = np.zeros(101)
         self.avgs = []
+        self.avgn = 1
         
       
         # Set up
@@ -131,6 +132,7 @@ class MainWindow(FormUI, WindowUI):
         self.couplingCombo.currentIndexChanged.connect(self.OnOscYChanged)
         self.rangeSpin.valueChanged.connect(self.OnOscYChanged)
         self.offsetSpin.valueChanged.connect(self.OnOscYChanged)
+        self.avgSpin.valueChanged.connect(self.OnAvgChanged)
         self.autorangeCheck.toggled.connect(self.OnAutoRangeToggled)
         self.triggerCombo.currentIndexChanged.connect(self.OnTriggerChanged)
         self.triglvSpin.valueChanged.connect(self.OnTriggerChanged)
@@ -202,6 +204,7 @@ class MainWindow(FormUI, WindowUI):
             self.statusbar.showMessage(f"Preparing...")
 
             self.willstop = False
+            self.OnAvgChanged()
             
             sw_start = self.startSpin.value()
             sw_stop = self.stopSpin.value()
@@ -288,13 +291,11 @@ class MainWindow(FormUI, WindowUI):
                     else:
                         self.has_data = False
                     
-                    avgn = self.avgSpin.value()
-                    
-                    if avgn > 1:
-                        if len(self.avgs) < avgn:
+                    if self.avgn > 1:
+                        if len(self.avgs) < self.avgn:
                             self.avgs.append(data_y)
-                        elif len(self.avgs) > avgn:
-                            self.avgs = self.avgs[:avgn]
+                        elif len(self.avgs) > self.avgn:
+                            self.avgs = self.avgs[:self.avgn]
                         else:
                             self.avgs.append(self.avgs.pop(0))
                             self.avgs[-1] = data_y
@@ -640,6 +641,11 @@ class MainWindow(FormUI, WindowUI):
             self.measTimer.start()
 
         self.statusbar.showMessage(f"Acquisition type updated")
+
+    def OnAvgChanged(self):
+        self.avgn = self.avgSpin.value()
+        del self.avgs
+        self.avgs = []
             
     def OnChangeYScale(self):
         if self.voltRadio.isChecked():
@@ -706,7 +712,6 @@ class MainWindow(FormUI, WindowUI):
             y_unit = "Power (mW)"
         elif self.dbRadio.isChecked():
             y_unit = "Power (dBm)"
-
 
         if filename[-4:] == ".csv":
             with open(filename, 'w') as f:
