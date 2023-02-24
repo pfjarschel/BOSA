@@ -691,19 +691,35 @@ class MainWindow(FormUI, WindowUI):
         
         lastslash = filename.rfind("/")
         self.lastdir = filename[:lastslash + 1]
-       
+
+        x_unit = ""
+        y_unit = ""
+
+        if self.nmRadio.isChecked():
+            x_unit = "Wavelength (nm)"
+        elif self.thzRadio.isChecked():
+            x_unit = "Frequency (THz)"
+
+        if self.voltRadio.isChecked():
+            y_unit = "Amplitude (V)"
+        elif self.linRadio.isChecked():
+            y_unit = "Power (mW)"
+        elif self.dbRadio.isChecked():
+            y_unit = "Power (dBm)"
+
+
         if filename[-4:] == ".csv":
             with open(filename, 'w') as f:
-                f.write("Wavelength (nm),Power (mW),Power (dBm)\n")
+                f.write(f"{x_unit},{y_unit}\n")
                 for i in range(len(self.x_results)):
-                    f.write(f"{self.x_results[i]:.3f},{self.y_results[i]:.6f}\n")
+                    f.write(f"{self.x_results[i]:.6f},{self.y_results[i]:.6f}\n")
                 f.close()
                 self.statusbar.showMessage(f"Results saved")
         elif len(filename) > 0:
             with open(filename, 'w') as f:
-                f.write("Wavelength (nm),Power (mW),Power (dBm)\n")
+                f.write(f"{x_unit}\t{y_unit}\n")
                 for i in range(len(self.x_results)):
-                    f.write(f"{self.x_results[i]:.3f},{self.y_results[i]:.6f}\n")
+                    f.write(f"{self.x_results[i]:.6f}\t{self.y_results[i]:.6f}\n")
                 f.close()
                 self.statusbar.showMessage(f"Results saved")
 
