@@ -323,8 +323,9 @@ class MainWindow(FormUI, WindowUI):
             if self.willstop:
                 self.Stop()
             else:
-                t1 = threading.Thread(target=self.threadLoop)
-                t1.start()
+                # t1 = threading.Thread(target=self.threadLoop)
+                # t1.start()
+                self.threadLoop()
             
     def StopButton(self):
         if self.sweeping and self.inited:
